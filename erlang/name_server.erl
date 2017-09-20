@@ -41,11 +41,11 @@ stop() ->
 % Note: the init/1 function is called *automatically* by server_gen when it
 % starts, to allow (actual call is done by server_gen:init/2, but that is
 % invisible from us and we should not care) us to perform *custom*
-% initialisation. The returned 'State' is then used by server_gen to start its
-% own process loop.
-init(State) ->
+% initialisation. The returned state (in this case it is the same as 'Args') is
+% then used by server_gen to start its own process loop.
+init(Args) ->
   true = erlang:register(?MODULE, self()),
-  State.
+  Args.
 
 %% Handles the server cleanup.
 %
