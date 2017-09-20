@@ -114,26 +114,21 @@ init_strategy(always) -> always.
 loop(State = {Strategy, ChildPid, Mfa = {M, F, A}}) ->
   receive
     {'EXIT', ChildPid, normal} ->
-      % io:format("Process ~p exited normally.~n", [ChildPid]),
       ?DEBUG("Process ~p exited normally.", [ChildPid]),
       loop(State);
 
     {'EXIT', ChildPid, Reason} ->
-      % io:format("Process ~p exited with reason: ~p.~n", [ChildPid, Reason]),
       ?TRACE("Process ~p exited with reason: ~p.", [ChildPid, Reason]),
 
       case Strategy of
         {max, Max, Max} ->
-          % io:format("Limit reached (~p) and won't restart child again!~n", [Max]),
           ?INFO("Limit reached (~p) and won't restart child again!", [Max]),
           exit(kill);
         {max, N, Max} ->
-          % io:format("Limit not reached (~p/~p); restarting child.~n", [N, Max]),
           ?DEBUG("Limit not reached (~p/~p); restarting child.", [N, Max]),
           NewChildPid = apply(M, F, [A]),
           loop({{max, N + 1, Max}, NewChildPid, Mfa});
         always ->
-          % io:format("No limits imposed; restarting child.~n"),
           ?DEBUG("No limits imposed; restarting child."),
           NewChildPid = apply(M, F, [A]),
           loop({Strategy, NewChildPid, Mfa})
