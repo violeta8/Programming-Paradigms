@@ -1,120 +1,173 @@
--module(name_server_a).
--export([start/1, loop/1, stop/0]). % Server exports.
+%%%-------------------------------------------------------------------
+%%% @author Duncan Paul Attard
+%%% Created: 20 Sep 2017
+%%%-------------------------------------------------------------------
+-module(name_server).
+-export([start/1, start_link/1, stop/0]). % Server exports.
 -export([resolve/1, register/2, unregister/1, status/0]). % Client exports.
+-export ([init/1, terminate/1, handle/2]). % Callback exports.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Server functions.                                                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Starts the server and initialises it with the specified list of Name-IP pairs.
+%% Starts the server and initialises it with the specified list of Name-IP pairs.
 start(NamesIps) ->
 
-  % Note: Using register(..) would have been fine in oter applications, but
-  % since I have defined a register/2 function myself in this file, I *must*
-  % use the fully-qualified form 'erlang:register(..)', otherwise the compiler
-  % will complain.
-  erlang:register(?MODULE, spawn(?MODULE, loop, [NamesIps])).
+  % Note: the start/1 function is delegating the task of starting the server
+  % loop to the server_gen:start/2 function.
+  server_gen:start(?MODULE, NamesIps).
 
-% The main server loop that goes on forever, unless the message consisting of
-% just the atom 'stop' is received.
-% Note: The server loop has a single state variable containing a list of
-% Name-IP pairs.
-loop(NameIps) ->
-  receive
+%% Starts the server and initialises it with the specified list of Name-IP pairs.
+%% The server is linked to the calling process.
+start_link(NamesIps) ->
+  server_gen:start_link(?MODULE, NamesIps).
 
-    % Stops the server.
-    {From, Tag, stop} ->
-      From ! {Tag, {ok, stopped}};
+%% Stops the server.
+stop() ->
 
-    % Inquires the server status.
-    {From, Tag, status} ->
-      From ! {Tag, {ok, length(NameIps)}},
-      loop(NameIps);
+  % Note: the stop/0 function is delegating the task of stopping the server
+  % loop to the server_gen:stop/1 function.
+  server_gen:stop(?MODULE).
 
-    % Fetches the registered name from the server's list of Name-IP pairs.
-    % If no such Name is found, and error is returned.
-    {From, Tag, {resolve, Name}} ->
-      case lists:keyfind(Name, 1, NameIps) of
-        false ->
 
-          % Requested name was not found - reply with error.
-          From ! {Tag, {error, not_found}};
-        {Name, Ip} ->
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Callback functions.                                                          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-          % Requested name was found - reply with OK.
-          From ! {Tag, {ok, Ip}}
-      end,
-      loop(NameIps);
+%% Handles server initialisation.
+%
+% Note: the init/1 function is called *automatically* by server_gen when it
+% starts, to allow (actual call is done by server_gen:init/2, but that is
+% invisible from us and we should not care) us to perform *custom*
+% initialisation. The returned 'State' is then used by server_gen to start its
+% own process loop.
+init(State) ->
+  true = erlang:register(?MODULE, self()),
+  State.
 
-    % Adds the Name and corresponding IP to the server's list of Name-IP pairs.
-    % If a Name already exists, an error is returned.
-    {From, Tag, {register, Pair = {Name, Ip}}} ->
-      case lists:keyfind(Name, 1, NameIps) of
-        false ->
+%% Handles the server cleanup.
+%
+% Note: this function is called *automatically* by server_gen when it stops
+% (actual call is done by the process loop when it matches a 'stop' message sent
+% by server_gen:stop/1, but that is invisible to us and we should not care) to
+% allow us to perform cleanup. The returned value is sent back to the client
+% that sent the stop message.
+terminate(_) -> {ok, stopped}.
 
-          % Name to be added was not found - reply to client with OK and add
-          % the new Name-IP pair to the current list of pairs in the server.
-          % Note: we call loop/1 with the *updated* list.
-          From ! {Tag, {ok, Ip}},
-          loop([Pair | NameIps]);
-        _ ->
 
-          % Name to be added was found and we should not create duplicates -
-          % reply to client with error.
-          % Note: we call loop/1 with the same list as nothing was added.
-          From ! {Tag, {error, already_exists}},
-          loop(NameIps)
-      end;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Client API callback functions.                                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    % Removes the registered Name and its corresponding IP from the list of
-    % Name-IP pairs.
-    % If no such Name is found, and error is returned.
-    {From, Tag, {unregister, Name}} ->
-      case lists:keyfind(Name, 1, NameIps) of
-        false ->
+% Note: the handle function is called back (hence the name 'callback') by the
+% process loop in server_gen. This occurs when a client sends a message to
+% the process and the receive clause in the loop in server_gen matches *any*
+% request (apart from 'stop').
+% The receive statement in server_gen is *generic*, and to handle the behaviour
+% specific to each particular message (e.g. a 'resolve' request), it *delegates*
+% (or forwards) this request to the handle function by simply calling it (examine
+% the code in server_gen and notice the Mod:handle(..) in its receive
+% statement). In this module, we implement those different clauses of handle,
+% one that handles each different type of messge:
+% 1. 'status',
+% 2. '{resolve, Name}',
+% 3. '{register, {Name, Ip}}', and
+% 4. '{unregister, Name}'.
+%
+% Each clause of handle is pattern-matched to determine which one should be used
+% to service the request. The implementation of each handle clause is simple:
+% it just returns the *data* that should be returned to the client as a reply.
+% Crucially however, it does *not* send it itself: this task is taken care of
+% by the receive statement back in server_gen.
+%
+% Notice how we split the generic server behaviour (looping, reading a request
+% and sending a reply inside server_gen), and the specific behaviour (each
+% request that is sent has handles input and output data using different
+% handle/2 clauses). Also notice the semicolon after each function clause for
+% handle/2: this is *one* function split into a number of clauses!
 
-          % Name to be removed not found - reply with error.
-          % Note: we call loop/1 with the same list as nothing was removed.
-          From ! {Tag, {error, not_found}},
-          loop(NameIps);
+%% Inquires the server status.
+%
+% Note: this clause is matched when a message of type 'status' is sent by the
+% client. State contains the list of Name-IP pairs.
+handle(status, State) ->
+  {{ok, length(State)}, State};
 
-        {Name, Ip} ->
+%% Fetches the registered 'Name' from the server's list of Name-IP pairs.
+%% If no such 'Name' is found, and error is returned.
+%
+% Note: this clause is matched when a message of type '{resolve, Name}' is sent
+% by the client.
+handle({resolve, Name}, State) ->
+  case lists:keyfind(Name, 1, State) of
+    false ->
 
-          % Name to be removed was found - reply to client with OK and removee
-          % the Name-IP pair from the current list of pairs in the server.
-          % Note: we call loop/1 with the *updated* list.
-          From ! {Tag, {ok, Ip}},
-          loop(lists:keydelete(Name, 1, NameIps))
-      end
+      % Requested name was not found - return error.
+      {{error, not_found}, State};
+    {Name, Ip} ->
+
+      % Requested name was found - return OK.
+      {{ok, Ip}, State}
+  end;
+
+%% Adds the 'Name' and corresponding 'Ip' to the server's list of Name-IP pairs.
+%% If a 'Name' already exists, an error is returned.
+%
+% Note: this clause is matched when a message of type '{register, Name, Ip}' is
+% sent by the client.
+handle({register, Pair = {Name, Ip}}, State) ->
+  case lists:keyfind(Name, 1, State) of
+    false ->
+
+      % 'Name' to be added was not found - return OK and add the new Name-IP pair
+      % to the current list of pairs in the server.
+      % Note: we return the *updated* list.
+      {{ok, Ip}, [Pair | State]};
+    _ ->
+
+      % 'Name' to be added was found and we should not create duplicates -
+      % return error.
+      % Note: we return the same list as nothing was added.
+      {{error, already_exists}, State}
+  end;
+
+%% Removes the registered 'Name' and its corresponding IP from the list of
+%% Name-IP pairs.
+%
+% If no such 'Name' is found, and error is returned.
+% Note: this clause is matched when a message of type '{unregister, Name}' is
+% sent by the client.
+handle({unregister, Name}, State) ->
+  case lists:keyfind(Name, 1, State) of
+    false ->
+
+      % 'Name' to be removed not found - reply error.
+      % Note: we return the same list as nothing was removed.
+      {{error, not_found}, State};
+
+    {Name, Ip} ->
+
+      % 'Name' to be removed was found - return OK and remove the Name-IP pair
+      % from the current list of pairs in the server.
+      % Note: we return the *updated* list.
+      {{ok, Ip}, lists:keydelete(Name, 1, State)}
   end.
-
-% Requests the server and waits for the reply.
-rpc(To, Request) ->
-  Tag = make_ref(),
-  To ! {self(), Tag, Request},
-  receive
-    {Tag, Reply} -> Reply
-  after 1000 ->
-    {error, timeout}
-  end.
-
-% Stops the server.
-stop() -> rpc(?MODULE, stop).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Client API.                                                                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Resolves the specified name to an IP.
-resolve(Name) -> rpc(?MODULE, {resolve, Name}).
+%% Resolves the specified 'Name' to an IP.
+resolve(Name) -> server_gen:rpc(?MODULE, {resolve, Name}).
 
-% Registers the specified name to the IP.
-register(Name, Ip) -> rpc(?MODULE, {register, {Name, Ip}}).
+%% Registers the specified 'Name' to the 'Ip'.
+register(Name, Ip) -> server_gen:rpc(?MODULE, {register, {Name, Ip}}).
 
-% Unregisters the speficied name.
-unregister(Name) -> rpc(?MODULE, {unregister, Name}).
+%% Unregisters the speficied 'Name'.
+unregister(Name) -> server_gen:rpc(?MODULE, {unregister, Name}).
 
-% Inquires the server status.
-status() -> rpc(?MODULE, status).
+%% Inquires the server's status.
+status() -> server_gen:rpc(?MODULE, status).
