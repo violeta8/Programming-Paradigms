@@ -63,7 +63,7 @@ loop(Mod, State) ->
   receive
     {From, Tag, stop} ->
       Status = Mod:terminate(State),
-      ?DEBUG("Stopping server ~p with status.", [self(), Status]),
+      ?DEBUG("Stopping server ~p with status ~p.", [self(), Status]),
       From ! {Tag, Status};
     {From, Tag, Request} ->
       {Reply, NewState} = Mod:handle(Request, State),
