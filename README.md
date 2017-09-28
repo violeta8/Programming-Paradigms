@@ -4,11 +4,11 @@ Here you will find tutorials, examples, and other accompanying material.
 
 # Installing Erlang #
 
-Erlang can be installed either by compiling it from source, or by downloading and installing one of the pre-compiled packages hosted on [erlang-solutions.com](https://www.erlang-solutions.com/resources/download.html).
+Erlang can be installed on multiple platforms by either compiling it from source, or by downloading and installing one of the pre-compiled packages hosted on [erlang-solutions.com](https://www.erlang-solutions.com/resources/download.html).
 
 ## Configuring the Erlang Shell ##
 
-In this course, we will not use sophisticated building mechanisms like `make` or `rebar`.
+In this course, we will not use sophisticated code-building mechanisms like `make` or `rebar`.
 Instead, we shall stick to the simplest possible compilation mechanism: namely compilation through the Erlang shell.
 This allows us to get used to the basic compilation commands, while at the same time, eliminating unnecessary complexities related to source code dependency management and others.
 
@@ -94,6 +94,14 @@ clm().
  {module,util}]
 ```
 
+The Erlang compiler can also be invoked from the terminal (_i.e._ outside the Erlang shell) using `erlc`:
+
+```
+$> erlc hello.erl
+```
+
+Note that by contrast to compiling from the Erlang shell, the `.erl` extension must be specified this time round.
+
 This completes the Erlang shell configuration guide.
 
 ## Setting up the Editor ##
@@ -103,7 +111,7 @@ Atom offers basic code syntax highlighting for a number of well known languages 
 It also offers support for a ton of user-created packages that can be downloaded and used for free, making it possible to extend the basic functionality provided by Atom.
 Atom can be downloaded from [atom.io](https://atom.io); for the list of available Atom packages, look at [https://atom.io/packages](https://atom.io/packages).
 
-In addition to the Erlan syntax highlighting provided out-of-the-box by Atom, we can provide additional anguage support by downloading the `language-erlang` plugin.
+We can provide Erlang language support by downloading the `language-erlang` Atom plugin.
 Open a new terminal window and type the following:
 
 ```
@@ -123,6 +131,53 @@ If you dislike the current look-and-feel that comes with the default Atom instal
 
 # Installing Go #
 
-## Using the Go compiler front-end ##
+Similar to Erlang, Go can be easily installed on multiple platforms using the pre-compiled packages found on [golang.org](https://golang.org/dl/).
+
+## Using the Go compiler ##
+
+As done for the Erlang case, we shall not use sophisticated code-building mechanisms, as the plain vanilla Go compiler will suffice for our purposes.
+Go comes with an easy-to-use compiler that can be invoked from the terminal through the `go` command.
+Invoking `go` displays a number of switches that can be used when compiling Go programs:
+
+```
+$> go
+Go is a tool for managing Go source code.
+
+Usage:
+
+	go command [arguments]
+
+The commands are:
+
+	build       compile packages and dependencies
+	clean       remove object files
+	doc         show documentation for package or symbol
+  ...
+```
+
+Go files can be build as follows:
+
+```
+$> go build hello.go
+```
+
+This generates the file `hello` containing the Go executable that can be run by simply:
+
+```
+$> hello
+Hello
+```
+
+To build and run you program in one step, use the following command:
+
+```
+$> go run hello.go
+Hello
+```
+
+Unlike `build` the run command does not leave the executable file `hello` behind it once the file has been successfully executed.
+Note that the file extension `.go` is specified when building the Go file.
 
 ## Setting up the Editor ##
+
+We shall use the same Atom editor that comes already equipped with syntax highlighting support for Go.
