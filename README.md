@@ -82,7 +82,7 @@ A more neat way of doing this would be to add a new function, say `clm/0` into t
 clm() -> cm, lm().
 ```
 
-Don't forget to export the function correctly (_i.e._ -export([clm/0])), save the file, and recompile it again from the Erlang shell using `c()`. Restart the Erlang shell for the changes to take effect. Test your new function by invoking `clm/0` on the shell, for instance:
+Don't forget to export the function correctly (_i.e._ `-export([clm/0])`), save the file, and recompile it again from the Erlang shell using `c()`. Restart the Erlang shell for the changes to take effect. Test your new function by invoking `clm/0` on the shell, for instance:
 
 ```
 clm().
@@ -104,7 +104,7 @@ Note that by contrast to compiling from the Erlang shell, the `.erl` extension m
 
 This completes the Erlang shell configuration guide.
 
-## Setting up the Editor ##
+## Setting up the Source Code Editor ##
 
 In this step, we shall configure the Atom text editor which will suffice for our coding purposes.
 Atom offers basic code syntax highlighting for a number of well known languages including Erlang.
@@ -125,7 +125,7 @@ To do this, open Atom, select `Atom` -> `Install Shell Commands` from the menu.
 
 If you dislike the current look-and-feel that comes with the default Atom installation, feel free to download and install the following packages:
 
-* `atom-material-ui`: a dynamic UI theme for that follows Google's Material Design Guidelines.
+* `atom-material-ui`: a dynamic UI theme for that follows Google's Material Design guidelines.
 * `atom-material-syntax`: a dark syntax theme  that uses Google's Material Design color palette.
 * `file-icons`: file extension icons and colors.
 
@@ -137,7 +137,7 @@ Similar to Erlang, Go can be easily installed on multiple platforms using the pr
 
 As done for the Erlang case, we shall not use sophisticated code-building mechanisms, as the plain vanilla Go compiler will suffice for our purposes.
 Go comes with an easy-to-use compiler that can be invoked from the terminal through the `go` command.
-Invoking `go` displays a number of switches that can be used when compiling Go programs:
+Invoking `go` displays a number of switches that can be used to manage the lifecycle of Go programs:
 
 ```
 $> go
@@ -155,7 +155,7 @@ The commands are:
   ...
 ```
 
-Go files can be build as follows:
+Go files can be built as follows:
 
 ```
 $> go build hello.go
@@ -164,20 +164,20 @@ $> go build hello.go
 This generates the file `hello` containing the Go executable that can be run by simply:
 
 ```
-$> hello
+$> ./hello
 Hello
 ```
 
-To build and run you program in one step, use the following command:
+To build and run your program in one step, use the following command:
 
 ```
 $> go run hello.go
 Hello
 ```
 
-Unlike `build` the run command does not leave the executable file `hello` behind it once the file has been successfully executed.
+Unlike `build`, the `run` command does _not_ leave the executable file `hello` behind it once the file has been successfully executed.
 Note that the file extension `.go` is specified when building the Go file.
 
-## Setting up the Editor ##
+## Setting up the Source Code Editor ##
 
 We shall use the same Atom editor that comes already equipped with syntax highlighting support for Go.
