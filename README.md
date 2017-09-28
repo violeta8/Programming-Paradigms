@@ -10,22 +10,22 @@ Erlang can be installed either by compiling it from source, or by downloading an
 
 In this course, we will not use sophisticated building mechanisms like `make` or `rebar`.
 Instead, we shall stick to the simplest possible compilation mechanism: namely compilation through the Erlang shell.
-This allows us to get used to the basic compilation commands, while at the same time, eliminating unnecessary complexities related to compilation and source code dependency management.
+This allows us to get used to the basic compilation commands, while at the same time, eliminating unnecessary complexities related to source code dependency management and others.
 
-Compilation can be done by invoking the `c()` command on the Erlang shell like so:
+Compilation can be done by invoking the `c()` function on the Erlang shell like so:
 ```
 > c(hello).
 ```
 
 This compiles the module `hello.erl` (note we did not specify the `.erl` extension in the above example), resulting in the creation of an object code file `hello.beam`.
 When a module is successfully compiled, it is automatically loaded by Erlang into the Erlang shell.
-We can verify this by invoking the `m()` command that displays the list of all loaded modules, together with the fully-qualified path pointing to the corresponding `.beam` file on the local file system.
-Compiling modules in this way can become cumbersome when the number of module is beyond a couple of modules.
+We can verify this by calling the `m()` function that displays the list of all loaded modules, together with the fully-qualified path pointing to the corresponding `.beam` file on the local file system.
+Compiling modules in this way can become cumbersome when the number of modules is beyond a couple.
 
 Erlang makes it possible for the user to configure and expose a number of utility functions that are automatically loaded and made accessible from the Erlang shell.
 We will use this mechanism to facilitate the compilation and loading of Erlang modules:
 
-1. Create a file named user_default.erl in your user home directory (mine is /Users/duncan), and paste in the following Erlang code:
+1. Create a file named `user_default.erl` in your user home directory (mine is `/Users/duncan`), and paste in the following Erlang code:
 
 ```
 -module(user_default).
@@ -42,7 +42,7 @@ purge_load(M) ->
   code:purge(M), code:load_file(M).
 ```
 
-2. Create a .erlang file in your user home directory, and paste in the following code:
+2. Create a `.erlang` file in your user home directory, and paste in the following code:
 ```
 code:load_abs("/Users/duncan/user_default").
 io:format("Loading my Erlang shell..~n").
@@ -76,13 +76,13 @@ To compile and load the Erlang files in one step, you can type the following on 
 > cm(), lm().
 ```
 
-A more neat way of doing this would be to add a new function, say clm/0 into the `user_default.erl` file:
+A more neat way of doing this would be to add a new function, say `clm/0` into the `user_default.erl` file like so:
 
 ```
 clm() -> cm, lm().
 ```
 
-Don't forget to export the function correctly, save the file, and recompile it again from the Erlang shell using `c()`. Restart the Erlang shell for the changes to take effect. Test your new function by invoking `clm/0` on the shell, for instance:
+Don't forget to export the function correctly (_i.e._ -export([clm/0])), save the file, and recompile it again from the Erlang shell using `c()`. Restart the Erlang shell for the changes to take effect. Test your new function by invoking `clm/0` on the shell, for instance:
 
 ```
 clm().
@@ -100,10 +100,10 @@ This completes the Erlang shell configuration guide.
 
 In this step, we shall configure the Atom text editor which will suffice for our coding purposes.
 Atom offers basic code syntax highlighting for a number of well known languages including Erlang.
-It also offers support for a ton of user-created packages that can be downloaded and used, making it possible to extend the basic functionality provided by Atom.
+It also offers support for a ton of user-created packages that can be downloaded and used for free, making it possible to extend the basic functionality provided by Atom.
 Atom can be downloaded from [atom.io](https://atom.io); for the list of available Atom packages, look at [https://atom.io/packages](https://atom.io/packages).
 
-In addition to the Erlan syntax highlighting provided out of the box by Atom, we can also provide language support by downloading the `language-erlang` plugin.
+In addition to the Erlan syntax highlighting provided out-of-the-box by Atom, we can provide additional anguage support by downloading the `language-erlang` plugin.
 Open a new terminal window and type the following:
 
 ```
@@ -115,10 +115,10 @@ To do this, open Atom, select `Atom` -> `Install Shell Commands` from the menu.
 
 ### Bonus ###
 
-If you dislike the current look-and-feel that comes with the default atom installation, feel free to download and install the following Atom packages:
+If you dislike the current look-and-feel that comes with the default Atom installation, feel free to download and install the following packages:
 
 * `atom-material-ui`: a dynamic UI theme for that follows Google's Material Design Guidelines.
-* `atom-material-syntax`: A dark syntax theme for Atom that uses Google's Material Design color palette.
+* `atom-material-syntax`: a dark syntax theme  that uses Google's Material Design color palette.
 * `file-icons`: file extension icons and colors.
 
 # Installing Go #
