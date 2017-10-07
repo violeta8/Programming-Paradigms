@@ -61,7 +61,7 @@ $> erlc user_default.erl
 ```
 Both methods should result in the creation of a `user_default.beam` file.
 
-4. (Skip this if you compiled using `erlc`) Close the Erlang shell (by typing `q().`) and reopen it again, to allow the shell to take into account these new changes. One loaded, you should see something like the following in your shell:
+4. Close the Erlang shell (by typing `q().`) and reopen it again, to allow the shell to take into account these new changes; if compilation was done using `erlc`, open a new shell instead. Once loaded, you should see something like the following in your shell:
 
 ```
 Erlang/OTP 18 [erts-7.3] [source-d2a6d81] [64-bit] [smp:4:4] [async-threads:10] [hipe] [kernel-poll:false]
