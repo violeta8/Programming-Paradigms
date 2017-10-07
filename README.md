@@ -48,13 +48,13 @@ code:load_abs("/Users/duncan/user_default").
 io:format("Loading my Erlang shell..~n").
 ```
 
-3. Fire up the Erlang shell (make sure you are in your home directory) by typing `erl` on the command prompt, and compile the `user_default.erl` file.
+3. Fire up the Erlang shell (make sure you are in your home directory) by typing `erl` on the command prompt, and compile the `user_default` module (note the absence of the `.erl` extension when compiling from within the shell).
 
 ```
 > c(user_default).
 ```
 
-You can also compile the `user_default` module from the terminal by directly invoking the Erlang compiler from the terminal:
+You can also compile the `user_default` module from the terminal by directly invoking the Erlang compiler from the terminal (note the _presence_ of the `.erl` extension when compiling from _without_ the Erlang shell):
 
 ```
 $> erlc user_default.erl
