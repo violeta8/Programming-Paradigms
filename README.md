@@ -48,13 +48,20 @@ code:load_abs("/Users/duncan/user_default").
 io:format("Loading my Erlang shell..~n").
 ```
 
-3. Fire up the Erlang shell (make sure you are in your home directory) by typing `erl` on the command prompt, and compile the `user_default.erl` file. This should result in the creation of a `user_default.beam` file:
+3. Fire up the Erlang shell (make sure you are in your home directory) by typing `erl` on the command prompt, and compile the `user_default.erl` file.
 
 ```
 > c(user_default).
 ```
 
-4. Close the Erlang shell (by typing `q().`) and reopen it again, to allow the shell to take into account these new changes. One loaded, you should see something like the following in your shell:
+You can also compile the `user_default` module from the terminal by directly invoking the Erlang compiler from the terminal:
+
+```
+$> erlc user_default.erl
+```
+Both methods should result in the creation of a `user_default.beam` file.
+
+4. (Skip this if you compiled using `erlc`) Close the Erlang shell (by typing `q().`) and reopen it again, to allow the shell to take into account these new changes. One loaded, you should see something like the following in your shell:
 
 ```
 Erlang/OTP 18 [erts-7.3] [source-d2a6d81] [64-bit] [smp:4:4] [async-threads:10] [hipe] [kernel-poll:false]
