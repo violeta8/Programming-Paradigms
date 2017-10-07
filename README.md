@@ -77,7 +77,8 @@ The first file `user_default.erl` exports two functions (you can add your own if
 
 2. `cm/1` compiles all the Erlang source code files, but does not load them.
 
-To compile and load the Erlang files in one step, you can type the following on the Erlang shell:
+You will find these two utility functions useful especially whilst working on your assignment.
+To compile and load the Erlang modules in one step, you can type the following on the Erlang shell:
 
 ```
 > cm(), lm().
@@ -89,7 +90,7 @@ A more neat way of doing this would be to add a new function, say `clm/0` into t
 clm() -> cm, lm().
 ```
 
-Don't forget to export the function correctly (_i.e._ `-export([clm/0])`), save the file, and recompile it again from the Erlang shell using `c()`. Restart the Erlang shell for the changes to take effect. Test your new function by invoking `clm/0` on the shell, for instance:
+You can add it if you like. Don't forget to export the function correctly (_i.e._ `-export([clm/0])`), save the file, and recompile it again. Remember that you need to restart the current Erlang shell or open a new one for the changes to take effect. Test your new function by invoking `clm/0` on the shell, for instance:
 
 ```
 clm().
@@ -100,14 +101,6 @@ clm().
  {module,switch_naive},
  {module,util}]
 ```
-
-The Erlang compiler can also be invoked from the terminal (_i.e._ outside the Erlang shell) using `erlc`:
-
-```
-$> erlc hello.erl
-```
-
-Note that by contrast to compiling from the Erlang shell, the `.erl` extension must be specified this time round.
 
 This completes the Erlang shell configuration guide.
 
