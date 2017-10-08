@@ -84,7 +84,7 @@ To compile and load the Erlang modules in one step, you can type the following o
 > cm(), lm().
 ```
 
-A more neat way of doing this would be to add a new function, say `clm/0` into the `user_default.erl` file like so:
+A more neat way of doing this would be to add a new function, say `clm/0`, into the `user_default.erl` file like so:
 
 ```
 clm() -> cm, lm().
