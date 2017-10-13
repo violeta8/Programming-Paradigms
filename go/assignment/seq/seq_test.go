@@ -3,7 +3,7 @@
 ///
 /// Provides a batch of unit tests for worksheet 1.
 ///
-/// To run tests, use 'go test -v' on the command line from the module's
+/// To run tests, use 'go test -v' on the command line from the package's
 /// directory.
 /// ----------------------------------------------------------------------------
 package util
