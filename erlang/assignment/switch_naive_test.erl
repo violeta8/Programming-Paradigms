@@ -95,11 +95,9 @@ subscribe_unsubscribe_test_() -> {foreach,
 %%   * Name::atom() is the process name to wait for.
 %% Returns: ok once the process Name is registered.
 %% -----------------------------------------------------------------------------
-pause_until_registered(Name) ->
+pause_until_registered(Name) when is_atom(Name) ->
   case whereis(Name) of
     undefined ->
-      % pause_after(fun() -> ok end, ?PAUSE_MILLIS),
-      % io:fwrite(user, "Waiting~n", []),
       pause_until_registered(Name);
     _ -> ok
   end.
