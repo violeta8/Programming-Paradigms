@@ -119,9 +119,8 @@ for(_, _, _) ->
 %% Returns: A single value that reflects the reduction of List.
 %% -----------------------------------------------------------------------------
 reduce(_, Acc, []) ->
-  Acc;
-reduce(F, Acc, [Hd | Tl]) ->
-  reduce(F, F(Hd, Acc), Tl).
+  % TODO: Add implementation.
+  ok.
 
 %% -----------------------------------------------------------------------------
 %% Maps a list of elements into another list of elements having equal length.
