@@ -2,7 +2,7 @@
 %%% @author Duncan Paul Attard
 %%%
 %%% Provides a number of macros that act as the frontend to the logging
-%%% functions in log.hrl.
+%%% functions in log.erl.
 %%% ----------------------------------------------------------------------------
 
 
