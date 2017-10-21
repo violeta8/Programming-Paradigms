@@ -17,23 +17,24 @@
 %%%   * Msg::string() is the message that was sent.
 %%%
 %%% The structure of the internal switch state is a list of mobile subscribers:
-%%% subs() = [{Msisdn::string(), Pid::pid()}, Pending::pending()] where:
+%%% subs() = [{Msisdn::string(), Pid::pid(), Pending::pending()}] where:
 %%%   * Msisdn::string() is the mobile number of the owner.
 %%%   * Pid::pid() | 0 is the unique ID associated with this mobile number. Pid
 %%%     will be conveniently used to send messages (using the primitive !) to
 %%%     other processes (next step of the assignment) that represent the mobile
 %%%     phones of other users.
-%%%   A user who is attached to the mobile network is represented by an actual
-%%%   Pid value that is used to send messages with. When the user is not
-%%%   attached to the mobile network, Pid is set to 0 to denote non-attachment.
-%%%   For now, all the new subscribers that are created are not attached to the
-%%%   mobile network, so set the Pid = 0. We will see how this can be
-%%%   dynamically changed when we cover the attach and detach operations.
-%%%   Pending::pending() is the list of messages that have not yet been
-%%%   delivered because the recipient is not currently attached to the mobile
-%%%   network (i.e. the tuple for a particular MSISDN has its Pid set to 0 and
-%%%   cannot recieve process messages). Pending is reset to [] when the mobile
-%%%   corresponding subscriber MSISDN attaches itself to the mobile network.
+%%%     A user who is attached to the mobile network is represented by an actual
+%%%     Pid value that is used to send messages with. When the user is not
+%%%     attached to the mobile network, Pid is set to 0 to denote
+%%%     non-attachment. For now, all the new subscribers that are created are
+%%%     not attached to the mobile network, so set the Pid = 0. We will see how
+%%%     this can be dynamically changed when we cover the attach and detach
+%%%     operations.
+%%%   * Pending::pending() is the list of messages that have not yet been
+%%%     delivered because the recipient is not currently attached to the mobile
+%%%     network (i.e. the tuple for a particular MSISDN has its Pid set to 0 and
+%%%     cannot recieve process messages). Pending is reset to [] when the mobile
+%%%     corresponding subscriber MSISDN attaches itself to the mobile network.
 %%%
 %%% This naive implementation does not use a generic server, but handles the
 %%% processing of messages in its own process loop.
@@ -131,7 +132,7 @@ loop(Store) ->
   receive
     {From, Tag, stop} ->
       ?DEBUG("Stopping server."),
-      
+
       From ! {Tag, {ok, stopped}};
 
     {From, Tag, status} ->
