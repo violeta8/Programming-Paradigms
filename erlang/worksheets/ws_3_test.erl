@@ -145,20 +145,6 @@ calc_super_test_() -> [
 %%% ------------------------------------------------------------------------ %%%
 
 %% -----------------------------------------------------------------------------
-%% Executes the function and waits before returning the result.
-%% pause_after(F, Millis) where:
-%%   F:fun() is the function to execute.
-%%   Millis::number() are the number of milliseconds to wait.
-%% Returns: R:term(), the return result of F.
-%% -----------------------------------------------------------------------------
-% pause_after(F, Millis) ->
-%   R = F(),
-%   receive
-%   after Millis ->
-%     R
-%   end.
-
-%% -----------------------------------------------------------------------------
 %% Blocks the caller until the specified process PID is dead.
 %% pause_until_dead(Pid) where:
 %%   * Pid:pid() is the process PID to wait for.
