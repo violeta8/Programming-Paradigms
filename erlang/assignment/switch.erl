@@ -23,7 +23,7 @@
 %%%   * Msg::string() is the message that was sent.
 %%%
 %%% The structure of the internal switch state is a list of mobile subscribers:
-%%% subs() = [{Msisdn::string(), Pid::pid()}, Pending::pending()] where:
+%%% subs() = [{Msisdn::string(), Pid::pid(), Pending::pending()}] where:
 %%%   * Msisdn::string() is the mobile number of the owner.
 %%%   * Pid::pid() | 0 is the unique ID associated with this mobile number. Pid
 %%%     is conveniently used to send messages (using the primitive !) to other
