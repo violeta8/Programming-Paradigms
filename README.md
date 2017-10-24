@@ -6,6 +6,19 @@ Here you will find tutorials, examples, and other accompanying material.
 
 Erlang can be installed on multiple platforms by either compiling it from source, or by downloading and installing one of the pre-compiled packages hosted on [erlang-solutions.com](https://www.erlang-solutions.com/resources/download.html).
 
+On Linux you can also install Erlang using `apt`:
+```
+sudo apt-get install erlang
+```
+
+macOS users can install Erlang using Homebrew as well:
+```
+brew install erlang
+```
+
+In any case, after the Erlang distribution has been installed, make sure that the `PATH` variable has been configured correctly.
+Try running `erl` or `erlc` to determine whether the Erlang binaries have been properly included in your system path.
+
 ## Configuring the Erlang Shell ##
 
 In this course, we will not use sophisticated code-building mechanisms like `make` or `rebar`.
