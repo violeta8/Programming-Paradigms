@@ -100,7 +100,7 @@ To compile and load the Erlang modules in one step, you can type the following o
 A more neat way of doing this would be to add a new function, say `clm/0`, into the `user_default.erl` file like so:
 
 ```
-clm() -> cm, lm().
+clm() -> cm(), lm().
 ```
 
 You can add it if you like. Don't forget to export the function correctly (_i.e._ `-export([clm/0])`), save the file, and recompile it again. Remember that you need to restart the current Erlang shell or open a new one for the changes to take effect. Test your new function by invoking `clm/0` on the shell, for instance:
