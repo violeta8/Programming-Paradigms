@@ -5,7 +5,7 @@
 %%% ----------------------------------------------------------------------------
 -module(ws_3).
 -export([calc/0, calc_link/0, calc_super/0, rpc/2]).
--export([calc_loop/0, calc_super_loop/2]). % Internal exports.
+-export([calc_loop/0, calc_super_loop/3]). % Internal exports.
 
 %% -----------------------------------------------------------------------------
 %% Spawns a process which loops indefinitely until stopped, acting as a simple
@@ -98,14 +98,21 @@ calc_super() ->
     % This we do for reference purposes.
     CallerPid ! Pid,
 
-    calc_super_loop(0, CallerPid)
+    calc_super_loop(0, Pid, CallerPid)
   end).
 
 %% -----------------------------------------------------------------------------
 %% The calculator supervisor process loop.
-%% calc_super_loop(Restarts) where:
+%% calc_super_loop(Restarts, Pid, CallerPid) where:
 %%   * Restarts::integer() is the number of times the calculator process has
 %%     been restarted.
+%%   * Pid::pid() is the PID of the newly spawned calculator process that will
+%%     be used to check that 'EXIT' messages are indeed being sent from the
+%%     calculator process, and not some other process. This prevents the
+%%     supervisor from spawning a new calculator process each time an 'EXIT'
+%%     message is received; instead it forces it to spawn a new calculator
+%%     process only when the 'EXIT' message was sent by the calculator process
+%%     whose PID we kept.
 %%   * CallerPid::pid() is the PID of the process that called the supervisor.
 %% Does not return.
 %%
@@ -123,7 +130,7 @@ calc_super() ->
 %%    Returns: {ok, Restarts::integer()} where Restarts is the number of times
 %%             the calculator process has been restarted.
 %% -----------------------------------------------------------------------------
-calc_super_loop(Restarts, CallerPid) ->
+calc_super_loop(Restarts, Pid, CallerPid) ->
   % TODO: Add implementation.
   ok.
 
