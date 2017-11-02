@@ -25,7 +25,7 @@ fetch_test_() -> [
   {"Fetch when an element exists in tuple list", ?_test(begin
 
     % Fetch non-empty list.
-    ?assertEqual({a, 1}, util:fetch(a, 1, [{a, 1}, {b, 2}]))
+    ?assertEqual({b, 2}, util:fetch(b, 1, [{a, 1}, {b, 2}]))
   end)},
   {"Fetch when an element does not exist in tuple list", ?_test(begin
 
