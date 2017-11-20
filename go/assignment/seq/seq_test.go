@@ -27,7 +27,7 @@ func TestFact(t *testing.T) {
 // Tests the Fact2 functionality.
 // -----------------------------------------------------------------------------
 func TestFact2(t *testing.T) {
-  res := Fact(10)
+  res := Fact2(10)
   fmt.Println("Fact2 test:", res)
   util.AssertEqual(t, 3628800, res, "")
 }

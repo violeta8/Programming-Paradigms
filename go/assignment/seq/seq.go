@@ -21,7 +21,7 @@ func Fact(n int) int {
 //   * n is the number whose factorial is to be computed.
 // Returns: The factorial for index n.
 // -----------------------------------------------------------------------------
-func Fact2(n int, acc int) int {
+func Fact2(n int) int {
   return Fact3(n, 1)
 }
 
