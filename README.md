@@ -117,31 +117,6 @@ clm().
 
 This completes the Erlang shell configuration guide.
 
-## Setting up the Source Code Editor ##
-
-In this step, we shall configure the Atom text editor which will suffice for our coding purposes.
-Atom offers basic code syntax highlighting for a number of well known languages including Erlang.
-It also offers support for a ton of user-created packages that can be downloaded and used for free, making it possible to extend the basic functionality provided by Atom.
-Atom can be downloaded from [atom.io](https://atom.io); for the list of available Atom packages, look at [https://atom.io/packages](https://atom.io/packages).
-
-We can provide Erlang language support by downloading the `language-erlang` Atom plugin.
-Open a new terminal window and type the following:
-
-```
-apm install language-erlang
-```
-
-If you get any complaints when invoking this command, make sure you have installed shell command support for Atom.
-To do this, open Atom, select `Atom` -> `Install Shell Commands` from the menu.
-
-### Bonus ###
-
-If you dislike the current look-and-feel that comes with the default Atom installation, feel free to download and install the following packages:
-
-* `atom-material-ui`: a dynamic UI theme for that follows Google's Material Design guidelines.
-* `atom-material-syntax`: a dark syntax theme  that uses Google's Material Design color palette.
-* `file-icons`: file extension icons and colors.
-
 # Installing Go #
 
 Similar to Erlang, Go can be easily installed on multiple platforms using the pre-compiled packages found on [golang.org](https://golang.org/dl/).
@@ -191,6 +166,48 @@ Hello
 Unlike `build`, the `run` command does _not_ leave the executable file `hello` behind it once the file has been successfully executed.
 Note that the file extension `.go` is specified when building the Go file.
 
-## Setting up the Source Code Editor ##
+This completes the GO configuration guide.
 
-We shall use the same Atom editor that comes already equipped with syntax highlighting support for Go.
+# Setting up the Source Code Editor
+
+We shall now configure a lightweight text editor that will allows us code Erlang and GO.
+
+## Visual Studio Code
+
+VSC can be downloaded from [code.visualstudio.com](https://code.visualstudio.com).
+
+### Erlang
+
+We provide Erlang language support by downloading the Erlang VSC plugin [here](https://marketplace.visualstudio.com/items?itemName=pgourlain.erlang).
+
+### GO
+
+For GO, we just download the VSC plugin [here](https://marketplace.visualstudio.com/items?itemName=ms-vscode.Go).
+
+## Atom
+
+We shall configure the Atom text editor which will suffice for our coding purposes. Atom can be downloaded from [atom.io](https://atom.io); for the list of available Atom packages, look at [https://atom.io/packages](https://atom.io/packages).
+
+### Erlang
+
+We provide Erlang language support by downloading the `language-erlang` Atom plugin.
+Open a new terminal window and type the following:
+
+```
+apm install language-erlang
+```
+
+If you get any complaints when invoking this command, make sure you have installed shell command support for Atom.
+To do this, open Atom, select `Atom` -> `Install Shell Commands` from the menu.
+
+### GO
+
+We shall use the same Atom editor that comes **already** equipped with syntax highlighting support for Go.
+
+### Bonus
+
+If you dislike the current look-and-feel that comes with the default Atom installation, feel free to download and install the following packages:
+
+* `atom-material-ui`: a dynamic UI theme for that follows Google's Material Design guidelines.
+* `atom-material-syntax`: a dark syntax theme  that uses Google's Material Design color palette.
+* `file-icons`: file extension icons and colors.
