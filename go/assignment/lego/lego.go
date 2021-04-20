@@ -85,12 +85,16 @@ func PlusSerial(in_x, in_y, out chan int) {
 // cases we can add two successive numbers from in_x or two successive numbers
 // from in_y, whereas our intended behaviour is that of adding one number from
 // in_x and the other from in_y together.
+// Note that the variables x and y are both initialized to 0 before we start 
+// reading from in_x and in_y respectively.
 // func PlusWrong(in_x, in_y, out chan) where:
 //   * in_x is a number to be added.
 //   * in_y is a number to be added.
 //   * out produces the addition of numbers in the following possibilities:
-//     1. in_x + in_x
-//     2. in_y + in_y
+//     1. in_x + 0 (the 1st read from in_x is discarded when the 2nd read from 
+//                  in_x performed; variable y = 0)
+//     2. in_y + 0 (the 1st read from in_y is discarded when the 2nd read from 
+//                  in_y performed; variable x = 0)
 //     3. in_x + in_y
 //     4. in_y + in_x
 // -----------------------------------------------------------------------------
