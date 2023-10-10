@@ -117,7 +117,7 @@ clm().
 
 This completes the Erlang shell configuration guide.
 
-# Installing Go #
+<!-- # Installing Go #
 
 Similar to Erlang, Go can be easily installed on multiple platforms using the pre-compiled packages found on [golang.org](https://golang.org/dl/).
 
@@ -166,11 +166,11 @@ Hello
 Unlike `build`, the `run` command does _not_ leave the executable file `hello` behind it once the file has been successfully executed.
 Note that the file extension `.go` is specified when building the Go file.
 
-This completes the GO configuration guide.
+This completes the GO configuration guide. -->
 
 # Setting up the Source Code Editor
 
-We shall now configure a lightweight text editor that will allows us code Erlang and GO.
+We shall now configure our preferred lightweight text editor that will allows us code Erlang and GO.
 
 ## Visual Studio Code
 
@@ -180,7 +180,9 @@ VSC can be downloaded from [code.visualstudio.com](https://code.visualstudio.com
 
 We provide Erlang language support by downloading the Erlang VSC plugin [here](https://marketplace.visualstudio.com/items?itemName=pgourlain.erlang).
 
-### GO
+With our Erlang and source code editor configuration complete, it's time to start programming 😁
+
+<!-- ### GO
 
 For GO, we just download the VSC plugin [here](https://marketplace.visualstudio.com/items?itemName=ms-vscode.Go).
 
@@ -210,4 +212,4 @@ If you dislike the current look-and-feel that comes with the default Atom instal
 
 * `atom-material-ui`: a dynamic UI theme for that follows Google's Material Design guidelines.
 * `atom-material-syntax`: a dark syntax theme  that uses Google's Material Design color palette.
-* `file-icons`: file extension icons and colors.
+* `file-icons`: file extension icons and colors. -->
