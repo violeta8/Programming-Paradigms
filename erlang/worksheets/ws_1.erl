@@ -16,9 +16,13 @@
 reverse(List) ->
   reverse2(List, []).
 
-reverse2(_, _) ->
-  % TODO: Add implementation.
-  ok.
+reverse2([], Acc) ->
+  Acc;
+reverse2([H|T], Acc) ->
+  reverse2(T, [H|Acc]).
+
+
+
 
 %% -----------------------------------------------------------------------------
 %% Computes fibonacci numbers using direct recursion.
@@ -29,10 +33,12 @@ reverse2(_, _) ->
 %% Note that we need both clauses for fib(0) and fib(1) because in the recursive
 %% step we are invoking fib/1 with both N - 1 and N - 2.
 %% -----------------------------------------------------------------------------
-fib1(_) ->
-  % TODO: Add implementation.
-  ok.
-
+fib1(0) ->
+  1;
+fib1(1) ->
+  1;
+fib1(N) when is_number(N), N >= 0 ->
+  fib1(N - 1) + fib1(N - 2).
 %% -----------------------------------------------------------------------------
 %% Computes fibonacci numbers using tail recursion.
 %% fib2(N) where:
@@ -75,9 +81,14 @@ fib1(_) ->
 fib2(N) when is_integer(N), N >= 0 ->
   fib3(N, 0, 1).
 
-fib3(_, _, _) ->
-  % TODO: Add implementation.
-  ok.
+fib3(0, NMinus2, _) ->
+  NMinus2;
+fib3(1, _, NMinus1) ->
+  NMinus1;
+fib3(N, NMinus2, NMinus1) ->
+  fib3(N - 1, NMinus1, NMinus1 + NMinus2).
+
+
 
 %% -----------------------------------------------------------------------------
 %% Converts a tuple to list.
@@ -88,9 +99,10 @@ fib3(_, _, _) ->
 tuple_to_list(Tuple) when is_tuple(Tuple) ->
   tuple_to_list2(Tuple, tuple_size(Tuple), []).
 
-tuple_to_list2(_, _, _) ->
-  % TODO: Add implementation.
-  ok.
+tuple_to_list2(_, 0, Acc) ->
+  Acc;
+tuple_to_list2(Tuple, N, Acc) ->
+  tuple_to_list2(Tuple, N - 1, [element(N, Tuple) | Acc]).
 
 %% -----------------------------------------------------------------------------
 %% Loops and applies the specified function from I to Max.
@@ -104,9 +116,12 @@ tuple_to_list2(_, _, _) ->
 %% for(0, 0, ..) would still yield a list with a value 0 (i.e. [0]), *not* the
 %% empty list.
 %% -----------------------------------------------------------------------------
-for(_, _, _) ->
-  % TODO: Add implementation.
-  ok.
+for(Max, Max, F) ->
+  [F(Max)];
+for(Start,Max,F) when Start < Max ->
+  [F(Start) | for(Start+1,Max,F)].
+  
+  
 
 %% -----------------------------------------------------------------------------
 %% Reduces a list of elements using the specified combining function F, starting
@@ -118,9 +133,12 @@ for(_, _, _) ->
 %%   * List::list() is the list to reduce using the combining function F.
 %% Returns: A single value that reflects the reduction of List.
 %% -----------------------------------------------------------------------------
-reduce(_, Acc, []) ->
-  % TODO: Add implementation.
-  ok.
+reduce(F, Seed, List) ->
+  reduce2(F, Seed, List).
+
+reduce2(_, _, _) ->
+  
+
 
 %% -----------------------------------------------------------------------------
 %% Maps a list of elements into another list of elements having equal length.
