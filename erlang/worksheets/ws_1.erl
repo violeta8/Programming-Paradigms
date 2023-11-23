@@ -6,7 +6,6 @@
 -module(ws_1).
 -export([reverse/1, fib1/1, fib2/1, tuple_to_list/1]).
 -export([for/3, reduce/3, map/2, filter/2]).
-
 %% -----------------------------------------------------------------------------
 %% Reverses the specified list.
 %% reverse(List) where:
@@ -20,9 +19,6 @@ reverse2([], Acc) ->
   Acc;
 reverse2([H|T], Acc) ->
   reverse2(T, [H|Acc]).
-
-
-
 
 %% -----------------------------------------------------------------------------
 %% Computes fibonacci numbers using direct recursion.
@@ -81,13 +77,12 @@ fib1(N) when is_number(N), N >= 0 ->
 fib2(N) when is_integer(N), N >= 0 ->
   fib3(N, 0, 1).
 
-fib3(0, NMinus2, _) ->
-  NMinus2;
-fib3(1, _, NMinus1) ->
-  NMinus1;
-fib3(N, NMinus2, NMinus1) ->
-  fib3(N - 1, NMinus1, NMinus1 + NMinus2).
-
+  fib3(0, _, _) ->
+    1;
+  fib3(1, _, _) ->
+    1;
+  fib3(N, NMinus2, NMinus1) when N > 1 ->
+    fib3(N - 1, NMinus1, NMinus1 + NMinus2).
 
 
 %% -----------------------------------------------------------------------------
@@ -122,7 +117,6 @@ for(Start,Max,F) when Start < Max ->
   [F(Start) | for(Start+1,Max,F)].
   
   
-
 %% -----------------------------------------------------------------------------
 %% Reduces a list of elements using the specified combining function F, starting
 %% with the seed value.
@@ -136,9 +130,10 @@ for(Start,Max,F) when Start < Max ->
 reduce(F, Seed, List) ->
   reduce2(F, Seed, List).
 
-reduce2(_, _, _) ->
-  
-
+reduce2(_, Acc, []) ->
+  Acc;
+reduce2(F, Acc, [H | T]) ->
+  reduce2(F, apply(F, [H, Acc]), T).
 
 %% -----------------------------------------------------------------------------
 %% Maps a list of elements into another list of elements having equal length.
@@ -149,8 +144,12 @@ reduce2(_, _, _) ->
 %% Returns: A new list with F applied on each element of the old List.
 %% -----------------------------------------------------------------------------
 map(F, List) ->
-  % TODO: Add implementation.
-  ok.
+  map2(F, List, []).
+
+map2(_, [], Acc) ->
+  reverse(Acc);
+map2(F, [H | T], Acc) ->
+  map2(F, T, [apply(F, [H]) | Acc]).
 
 %% -----------------------------------------------------------------------------
 %% Filters a list of elements according to the specifed predicate F.
@@ -163,5 +162,15 @@ map(F, List) ->
 %%          elements than the original List.
 %% -----------------------------------------------------------------------------
 filter(F, List) ->
-  % TODO: Add implementation.
-  ok.
+  filter2(F, List, []).
+
+filter2(_, [], Acc) ->
+  reverse(Acc);
+filter2(F, [H | T], Acc) ->
+  case apply(F, [H]) of
+    true ->
+      filter2(F, T, [H | Acc]);
+    false ->
+      filter2(F, T, Acc)
+  end.
+

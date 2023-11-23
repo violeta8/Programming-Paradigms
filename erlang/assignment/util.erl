@@ -6,6 +6,8 @@
 -module(util).
 -export ([fetch/3, remove/3, store/4, reverse/1]).
 
+%---------------------------------ASSGINMENT 3..-..PART 2 ERLANG-------------------------------
+%---------------------------------VIOLETA AI NAHARRO ZALDIVAR------------------------------
 
 %% -----------------------------------------------------------------------------
 %% Fetches the first tuple whose Nth element is equal to the value of key from
@@ -21,10 +23,9 @@
 fetch(Key, N, TupleList) when is_integer(N), N > 0 ->
   fetch2(Key, N, TupleList).
 
-fetch2(_, _, _) ->
-  % TODO: Add implementation.
-  ok.
-
+  fetch2(_, _, []) -> false;
+  fetch2(Key, N, [Tuple | _]) when element(N, Tuple) == Key -> Tuple;
+  fetch2(Key, N, [_ | T]) -> fetch2(Key, N, T).
 %% -----------------------------------------------------------------------------
 %% Removes all tuples whose Nth element is equal to the value of key from the
 %% specified TupleList.
@@ -40,9 +41,11 @@ fetch2(_, _, _) ->
 remove(Key, N, TupleList) when is_integer(N), N > 0 ->
   remove2(Key, N, TupleList).
 
-remove2(_, _, _) ->
-  % TODO: Add implementation.
-  ok.
+  remove2(_, _, []) -> [];
+  remove2(Key, N, [Tuple | Rest]) when tuple_size(Tuple) >= N, element(N, Tuple) == Key ->
+      remove2(Key, N, Rest);
+  remove2(Key, N, [Tuple | Rest]) ->
+      [Tuple | remove2(Key, N, Rest)].
 
 %% -----------------------------------------------------------------------------
 %% Replaces all the tuples whose Nth element is equal to the value of Key with
@@ -60,9 +63,12 @@ remove2(_, _, _) ->
 store(Key, N, TupleList, New) when is_integer(N), N > 0, is_tuple(New) ->
   store2(Key, N, TupleList, New, false).
 
-store2(_, _, _, _, _) ->
-  % TODO: Add implementation.
-  ok.
+  store2(_, _, [], New, false) -> [New];
+  store2(_, _, [], _, true) -> [];
+  store2(Key, N, [Tuple | Rest], New, _) when tuple_size(Tuple) >= N, element(N, Tuple) == Key ->
+      [New | store2(Key, N, Rest, New, true)];
+  store2(Key, N, [Tuple | Rest], New, Found) ->
+      [Tuple | store2(Key, N, Rest, New, Found)].
 
 %% -----------------------------------------------------------------------------
 %% Reverses the specified list.
@@ -73,6 +79,7 @@ store2(_, _, _, _, _) ->
 reverse(List) ->
   reverse2(List, []).
 
-reverse2(_, _) ->
-  % TODO: Add implementation.
-  ok.
+  reverse2([], Acc) ->
+    Acc;
+  reverse2([H|T], Acc) ->
+    reverse2(T, [H|Acc]).
