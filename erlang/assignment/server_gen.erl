@@ -224,7 +224,6 @@ handle_exit(Mod, From, Reason, State) ->
 %% -----------------------------------------------------------------------------
 loop(Mod, State) ->
   receive
-
     % Handles stop messages, optionally applies the terminate/1 callback if
     % implemented by the client, and finally, stops the server.
     {From, Tag, stop} ->

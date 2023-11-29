@@ -171,8 +171,14 @@ handle(status, State) -> {{ok, State}, State};
 %% The message request is handled synchronously.
 %% -----------------------------------------------------------------------------
 handle(tog_flight_mode, State = {Msisdn, Status}) ->
-  % TODO: Add implementation.
-  ok;
+  case switch:toggle_flight_mode() of
+    {ok, flight_mode_on} ->
+      {{ok, flight_mode_on}, {Msisdn, flight_mode_on}};
+    {ok, flight_mode_off} ->
+      {{ok, flight_mode_off}, {Msisdn, flight_mode_off}};
+    {error, Reason} ->
+      {{error, Reason}, State}
+  end;
 
 %% -----------------------------------------------------------------------------
 %% Handles a 'send message text' request message.
@@ -187,8 +193,8 @@ handle(tog_flight_mode, State = {Msisdn, Status}) ->
 %% The message request is handled synchronously.
 %% -----------------------------------------------------------------------------
 handle({send_msg, ToMsisdn, Msg}, State) ->
-  % TODO: Add implementation.
-  ok.
+  Reply = switch:send_msg(ToMsisdn, Msg),
+  {Reply, State}. % Return the reply from the switch.
 
 %% -----------------------------------------------------------------------------
 %% Handles a 'receive new text message' request message.

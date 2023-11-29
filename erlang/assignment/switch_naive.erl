@@ -132,21 +132,35 @@ loop(Store) ->
   receive
     {From, Tag, stop} ->
       ?DEBUG("Stopping server."),
-
       From ! {Tag, {ok, stopped}};
 
     {From, Tag, status} ->
-      % TODO: Add implementation.
-      ok;
+      Status = {ok, Store},
+      From ! {Tag, Status},
+      loop(Store);
 
     {From, Tag, {subscribe, Msisdn}} ->
-      % TODO: Add implementation.
-      ok;
+      Response = case lists:keyfind(Msisdn, 1, Store) of
+                   false -> % Msisdn no está suscrito
+                     {ok, subscribed};
+                   _ -> % Msisdn ya está suscrito
+                     {error, already_subscribed}
+                 end,
+      From ! {Tag, Response},
+      loop(Store);
 
     {From, Tag, {unsubscribe, Msisdn}} ->
-      % TODO: Add implementation.
-      ok
+      Response = case lists:keyfind(Msisdn, 1, Store) of
+                   {Msisdn, _, _} -> % Msisdn está suscrito
+                     {ok, unsubscribed};
+                   false -> % Msisdn no está suscrito
+                     {error, not_subscribed}
+                 end,
+      From ! {Tag, Response},
+      loop(Store)
   end.
+
+  
 
 
 %%% ------------------------------------------------------------------------ %%%
@@ -179,8 +193,7 @@ rpc(To, Request) ->
 %%          MSISDNs.
 %% -----------------------------------------------------------------------------
 status() ->
-  % TODO: Add implementation.
-  ok.
+  rpc(?MODULE, {status}).
 
 %% -----------------------------------------------------------------------------
 %% (Operator) Subscribes the specified Msisdn to the switch.
@@ -191,8 +204,12 @@ status() ->
 %%          | {error, already_subscribed} when Msisdn is already subscribed.
 %% -----------------------------------------------------------------------------
 subscribe(Msisdn) ->
-  % TODO: Add implementation.
-  ok.
+  case rpc(?MODULE, {subscribe, Msisdn}) of
+    {ok, subscribed} ->
+      {ok, subscribed};
+    {error, already_subscribed} ->
+      {error, already_subscribed}
+  end.
 
 %% -----------------------------------------------------------------------------
 %% (Operator) Unsubscribes the specified Msisdn from the switch.
@@ -203,5 +220,9 @@ subscribe(Msisdn) ->
 %%          | {error, not_subscribed} when Msisdn is not subscribed.
 %% -----------------------------------------------------------------------------
 unsubscribe(Msisdn) ->
-  % TODO: Add implementation.
-  ok.
+  case rpc(?MODULE, {unsubscribe, Msisdn}) of
+    {ok, unsubscribed} ->
+      {ok, unsubscribed};
+    {error, not_subscribed} ->
+      {error, not_subscribed}
+  end.
