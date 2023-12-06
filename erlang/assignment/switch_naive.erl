@@ -42,6 +42,7 @@
 -module(switch_naive).
 -include("log.hrl").
 
+
 %%% Switch API exports.
 -export([start/0, stop/0]).
 
@@ -50,7 +51,6 @@
 
 %%% Client API exports.
 -export([status/0, subscribe/1, unsubscribe/1]).
-
 
 %%% ------------------------------------------------------------------------ %%%
 %%% Switch API.                                                              %%%
@@ -134,33 +134,33 @@ loop(Store) ->
       ?DEBUG("Stopping server."),
       From ! {Tag, {ok, stopped}};
 
-    {From, Tag, status} ->
-      Status = {ok, Store},
-      From ! {Tag, Status},
-      loop(Store);
+      {From, Tag, status} ->
+        Reply = {ok, util:fetch(Store)},
+        From ! {Tag, Reply},
+        loop(Store);
+  
 
     {From, Tag, {subscribe, Msisdn}} ->
-      Response = case lists:keyfind(Msisdn, 1, Store) of
-                   false -> % Msisdn no está suscrito
-                     {ok, subscribed};
-                   _ -> % Msisdn ya está suscrito
-                     {error, already_subscribed}
-                 end,
-      From ! {Tag, Response},
-      loop(Store);
+      case subscribe(Msisdn) of
+        {ok, subscribed} ->
+          From ! {Tag, {ok, subscribed}},
+          loop(util:store(Msisdn, 1, Store, {Msisdn, 1, []}));
+        {error, already_subscribed} ->
+          From ! {Tag, {error, already_subscribed}},
+          loop(Store)
+      end;
 
     {From, Tag, {unsubscribe, Msisdn}} ->
-      Response = case lists:keyfind(Msisdn, 1, Store) of
-                   {Msisdn, _, _} -> % Msisdn está suscrito
-                     {ok, unsubscribed};
-                   false -> % Msisdn no está suscrito
-                     {error, not_subscribed}
-                 end,
-      From ! {Tag, Response},
-      loop(Store)
+      case unsubscribe(Msisdn) of
+        {ok, unsubscribed} ->
+          From ! {Tag, {ok, unsubscribed}},
+          loop(util:remove(Msisdn, 1, Store));
+        {error, not_subscribed} ->
+          From ! {Tag, {error, not_subscribed}},
+          loop(Store)
+      end
   end.
-
-  
+    
 
 
 %%% ------------------------------------------------------------------------ %%%
@@ -193,7 +193,8 @@ rpc(To, Request) ->
 %%          MSISDNs.
 %% -----------------------------------------------------------------------------
 status() ->
-  rpc(?MODULE, {status}).
+  rpc(?MODULE, self()).
+  
 
 %% -----------------------------------------------------------------------------
 %% (Operator) Subscribes the specified Msisdn to the switch.
@@ -203,14 +204,14 @@ status() ->
 %%          the switch.
 %%          | {error, already_subscribed} when Msisdn is already subscribed.
 %% -----------------------------------------------------------------------------
+
 subscribe(Msisdn) ->
   case rpc(?MODULE, {subscribe, Msisdn}) of
     {ok, subscribed} ->
       {ok, subscribed};
     {error, already_subscribed} ->
       {error, already_subscribed}
-  end.
-
+  end. 
 %% -----------------------------------------------------------------------------
 %% (Operator) Unsubscribes the specified Msisdn from the switch.
 %% unsubscribe(Msisdn) where:

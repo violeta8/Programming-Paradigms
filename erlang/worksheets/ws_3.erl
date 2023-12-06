@@ -46,8 +46,28 @@ calc() ->
 %%    3 above. The message is simply output to the screen and discarded.
 %% -----------------------------------------------------------------------------
 calc_loop() ->
-  % TODO: Add implementation.
-  ok.
+  receive
+    stop ->
+      io:fwrite(user, "Stopping calc.~n", []),
+      exit({ok, stopped});
+
+    {add, X, Y} ->
+      Sum = X + Y,
+      io:fwrite(user, "Adding ~p and ~p.~n", [X, Y]),
+      io:fwrite(user, "Sum is ~p.~n", [Sum]),
+      calc_loop();
+
+    {sub, X, Y} ->
+      Difference = X - Y,
+      io:fwrite(user, "Subtracting ~p from ~p.~n", [Y, X]),
+      io:fwrite(user, "Difference is ~p.~n", [Difference]),
+      calc_loop();
+
+    Msg ->
+      io:fwrite(user, "Unknown message: ~p.~n", [Msg]),
+      calc_loop()
+  end.
+  
 
 %% -----------------------------------------------------------------------------
 %% Spawns a process which loops indefinitely until stopped, acting as a simple
@@ -57,8 +77,7 @@ calc_loop() ->
 %% Returns: Pid::pid(), the PID of the newly spawned calculator process.
 %% -----------------------------------------------------------------------------
 calc_link() ->
-  % TODO: Add implementation.
-  ok.
+  spawn_link(?MODULE, calc_loop, []).
 
 % To reverse the effect of linking unlink/1 from the shell.
 % Run link/1 and unlink/1 and test manually on shell.
@@ -131,8 +150,30 @@ calc_super() ->
 %%             the calculator process has been restarted.
 %% -----------------------------------------------------------------------------
 calc_super_loop(Restarts, Pid, CallerPid) ->
-  % TODO: Add implementation.
-  ok.
+  receive
+    {'EXIT', Pid, _} ->
+
+      % Increment the number of restarts.
+      NewRestarts = Restarts + 1,
+
+      % Spawn a new calculator process.
+      NewPid = calc_link(),
+
+      io:fwrite(user, "Restarted calc with PID: ~p.~n", [NewPid]),
+
+      % Send calculator PID to the process that initially called the supervisor.
+      % This we do for reference purposes.
+      CallerPid ! NewPid,
+
+      % Recursively call the loop with the new number of restarts and the new
+      % calculator PID.
+      calc_super_loop(NewRestarts, NewPid, CallerPid);
+
+    status ->
+      CallerPid ! {ok, Restarts},
+      calc_super_loop(Restarts, Pid, CallerPid)
+  end.
+
 
 %% -----------------------------------------------------------------------------
 %% Sends a blocking request to the server and waits for a reply.

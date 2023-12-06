@@ -129,16 +129,16 @@ handle(status, Store) ->
 %% The message request is handled synchronously.
 %% -----------------------------------------------------------------------------
 handle({subscribe, Msisdn}, Store) ->
-  
-  % Check if Msisdn is already subscribed.
-  case lists:keyfind(Msisdn, 1, Store) of
-    false ->
-      % Msisdn is not subscribed; add it.
-      {ok, [{Msisdn, 0, []} | Store]};
-    _ ->
+  case util:fetch(Msisdn, 1, Store) of
+    {Msisdn, _, _} ->
       % Msisdn is already subscribed.
-      {error, already_subscribed}
+      {{error, already_subscribed}, Store};
+    false ->
+      % Msisdn is not subscribed; subscribe it.
+      NewStore = lists:append(Store, [{Msisdn, 0, []}]),
+      {{ok, subscribed}, NewStore}
   end;
+
   
 
 
@@ -158,16 +158,15 @@ handle({subscribe, Msisdn}, Store) ->
 %% The message request is handled synchronously.
 %% -----------------------------------------------------------------------------
 handle({unsubscribe, Msisdn}, Store) ->
-  % Check if Msisdn is already subscribed.
-  case lists:keyfind(Msisdn, 1, Store) of
+  case util:fetch(Msisdn, 1, Store) of
     {Msisdn, _, _} ->
-      % Msisdn is subscribed; remove it.
+      % Msisdn is subscribed; unsubscribe it.
       NewStore = lists:keydelete(Msisdn, 1, Store),
-      {ok, NewStore};
+      {{ok, unsubscribed}, NewStore};
     false ->
       % Msisdn is not subscribed.
-      {error, not_subscribed}
-  end;  
+      {{error, not_subscribed}, Store}
+  end;
 
 %% -----------------------------------------------------------------------------
 %% Handles a 'attach Msisdn to mobile network' request messge.
@@ -196,18 +195,24 @@ handle({unsubscribe, Msisdn}, Store) ->
 %% The message request is handled synchronously.
 %% -----------------------------------------------------------------------------
 handle({attach, Pid, Msisdn}, Store) ->
-  % Check if Msisdn is already subscribed.
-  case lists:keyfind(Msisdn, 1, Store) of
+  case util:fetch(Msisdn, 1, Store) of
     {Msisdn, 0, Pending} ->
-      % Msisdn is subscribed but not attached; attach it.
-      NewStore = lists:keyreplace(Msisdn, 1, Store, {Msisdn, Pid, Pending}),
-      {ok, attached, Pending, NewStore};
-    {Msisdn, Pid, _} ->
-      % Msisdn is already attached.
-      {error, already_attached, Store};
+      % Found the Msisdn, check if it's not already attached
+      case util:fetch(Pid, 2, Store) of
+        {ok, AttachedPid} when AttachedPid == 0 ->
+          % Not attached, proceed with attachment
+          NewStore = util:store(Msisdn, 2, Store, {Msisdn, Pid, []}),
+          {{ok, attached}, Pending, NewStore};
+        {ok, AttachedPid} when AttachedPid == Pid ->
+          % Already attached to the same Pid, return pending messages
+          {{ok, attached}, Pending, lists:attach(Pending, [])};
+        _ ->
+          % Msisdn is attached to a different Pid
+          {{error, already_attached}, Store}
+      end;
     false ->
-      % Msisdn is not subscribed.
-      {error, not_subscribed, Store}
+      % Msisdn not subscribed
+      {{error, not_subscribed}, Store}
   end;
 
 %% -----------------------------------------------------------------------------
@@ -229,16 +234,15 @@ handle({attach, Pid, Msisdn}, Store) ->
 %% The message request is handled synchronously.
 %% -----------------------------------------------------------------------------
 handle({detach, Pid}, Store) ->
-  % Check if Pid is found in Store.
-  case lists:keyfind(Pid, 2, Store) of
+  case util:fetch(Pid, 2, Store) of
     {Msisdn, Pid, Pending} ->
-      % Pid is found in Store; detach it.
-      NewStore = lists:keyreplace(Msisdn, 1, Store, {Msisdn, 0, Pending}),
-      {ok, detached, NewStore};
+      % Found the Pid, detach it
+      NewStore = util:store(Msisdn, 2, Store, {Msisdn, 0, Pending}),
+      {{ok, detached}, NewStore};
     false ->
-      % Pid is not found in Store.
-      {error, not_attached, Store}
-  end;  
+      % Pid not found
+      {{error, not_attached}, Store}
+  end;
 
 %% -----------------------------------------------------------------------------
 %% Handles a 'send message text' request message.
@@ -267,26 +271,26 @@ handle({detach, Pid}, Store) ->
 %% -----------------------------------------------------------------------------
 handle({send_msg, Pid, ToMsisdn, Msg}, Store) ->
   % Check if Pid is attached.
-case lists:keyfind(Pid, 2, Store) of
+case util:fetch(Pid, 2, Store) of
   {FromMsisdn, Pid, _} ->
     % Pid is attached.
     % Check if ToMsisdn is subscribed.
-    case lists:keyfind(ToMsisdn, 1, Store) of
+    case util:fetch(ToMsisdn, 1, Store) of
       {ToMsisdn, 0, Pending} ->
         % ToMsisdn is subscribed but not attached; queue the message.
         NewStore = lists:keyreplace(ToMsisdn, 1, Store, {ToMsisdn, 0, [ {FromMsisdn, Msg} | Pending]}),
-        {ok, msg_queued, NewStore};
+        {{ok, msg_queued}, NewStore};
       {ToMsisdn, ToPid, _} ->
         % ToMsisdn is subscribed and attached; send the message.
         ToPid ! {FromMsisdn, Msg},
-        {ok, msg_sent, Store};
+        {{ok, msg_sent}, Store};
       false ->
         % ToMsisdn is not subscribed.
-        {error, to_not_subscribed, Store}
+        {{error, to_not_subscribed}, Store}
     end;
   false ->
     % Pid is not attached.
-    {error, not_attached, Store}
+    {{error, not_attached}, Store}
 end.
 
 %% -----------------------------------------------------------------------------
@@ -307,16 +311,8 @@ end.
 %% The message request is handled asynchronously.
 %% -----------------------------------------------------------------------------
 handle_exit(Pid, _Reason, Store) ->
-  % Check if Pid is found in Store.
-  case lists:keyfind(Pid, 2, Store) of
-    {Msisdn, Pid, Pending} ->
-      % Pid is found in Store; detach it.
-      NewStore = lists:keyreplace(Msisdn, 1, Store, {Msisdn, 0, Pending}),
-      NewStore;
-    false ->
-      % Pid is not found in Store.
-      Store
-  end.
+  % TODO: Add implementation.
+  ok.
 
 
 %%% ------------------------------------------------------------------------ %%%

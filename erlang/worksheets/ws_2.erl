@@ -18,8 +18,12 @@
 %% 1. A message request that is output to the screen.
 %% -----------------------------------------------------------------------------
 log_msg_once() ->
-  % TODO: Add implementation.
-  ok.
+  spawn(fun() ->
+    receive
+      Msg ->
+        io:fwrite(user, "Received message: ~p.~n", [Msg])
+    end
+  end).
 
 %% -----------------------------------------------------------------------------
 %% Spawns a process which loops indefinitely, receiving messages and displaying
@@ -42,8 +46,11 @@ log_msg() ->
 %% 1. A message request that is output to the screen.
 %% -----------------------------------------------------------------------------
 log_msg_loop() ->
-  % TODO: Add implementation.
-  ok.
+  receive
+    Msg ->
+      io:fwrite(user, "Received message: ~p.~n", [Msg]),
+      log_msg_loop()
+  end.
 
 %% -----------------------------------------------------------------------------
 %% Spawns a process which loops indefinitely until stopped, acting as a counter
@@ -98,8 +105,25 @@ counter() ->
 %%    5 above. The message is simply output to the screen and discarded.
 %% -----------------------------------------------------------------------------
 counter_loop(Count) ->
-  % TODO: Add implementation.
-  ok.
+  receive
+    stop ->
+      ok;
+    {get, From} ->
+      From ! {ok, Count},
+      counter_loop(Count);
+    {put, From, Amt} ->
+      From ! {ok, put, Count},
+      counter_loop(Count + Amt);
+    {inc, From} ->
+      From ! {ok, inc, Count},
+      counter_loop(Count + 1);
+    {dec, From} ->
+      From ! {ok, dec, Count},
+      counter_loop(Count - 1);
+    Msg ->
+      io:fwrite(user, "Received message: ~p.~n", [Msg]),
+      counter_loop(Count)
+  end.
 
 %% -----------------------------------------------------------------------------
 %% Spawns a process which loops indefinitely until stopped, acting as a counter
@@ -111,5 +135,4 @@ counter_loop(Count) ->
 %% The process is registered against the name 'counter'.
 %% -----------------------------------------------------------------------------
 counter_named() ->
-  % TODO: Add implementation.
-  ok.
+  register(counter, spawn(?MODULE, counter_loop, [0])).
